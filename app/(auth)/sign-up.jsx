@@ -5,6 +5,28 @@ import { View, Text, ScrollView, Dimensions, Alert, Image } from "react-native";
 
 import { images } from "../../constants";
 import { CustomButton, FormField } from "../../components";
+import { initializeApp } from 'firebase/app';
+import { getAuth, createUserWithEmailAndPassword, initializeAuth, getReactNativePersistence } from 'firebase/auth';
+import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBmodBJKfsculZRntClnkDoisRhweXs8G8",
+  authDomain: "midtermflutter-9c698.firebaseapp.com",
+  projectId: "midtermflutter-9c698",
+  storageBucket: "midtermflutter-9c698.appspot.com",
+  messagingSenderId: "520367706279",
+  appId: "1:520367706279:web:fa4bbd0fa21290f17d0b82"
+};
+
+
+
+const app = initializeApp(firebaseConfig);
+initializeAuth(app, {
+  persistence: getReactNativePersistence(ReactNativeAsyncStorage)
+});
+
+
+
 
 const SignUp = () => {
   const [isSubmitting, setSubmitting] = useState(false);
@@ -14,15 +36,26 @@ const SignUp = () => {
     password: "",
   });
 
-  const submit = async () => {
 
+  const submit = async () => {
+    setSubmitting(true);
+    try {
+      await createUserWithEmailAndPassword(getAuth(app), form.email, form.password);
+      Alert.alert("Success", "Account created successfully!");
+      router.push('/sign-in'); 
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Error", error.message);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <SafeAreaView className="bg-primary h-full">
       <ScrollView>
         <View
-          className="w-full flex justify-center h-full px-4 my-6"
+          className="w-full flex justify-start h-full px-4 my-6"
           style={{
             minHeight: Dimensions.get("window").height - 100,
           }}
@@ -30,7 +63,7 @@ const SignUp = () => {
           <Image source={images.logo} className="w-[185px] h-[50px]" />
 
 
-          <Text className="text-2xl font-semibold text-white mt-10 font-psemibold">
+          <Text className="text-2xl font-semibold text-white mt-2 font-psemibold">
             Sign Up to SoundCharm
           </Text>
 
