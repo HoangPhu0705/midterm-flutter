@@ -34,7 +34,7 @@ export default function App() {
 
           <CustomButton
             title="Continue with email"
-            handlePress = {() => {router.push('/sign-in')}}
+            handlePress = {() => {router.push('/home')}}
             containerStyles = "w-full mt-7"
 
           />

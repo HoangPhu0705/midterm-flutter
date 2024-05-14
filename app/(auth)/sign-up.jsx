@@ -41,7 +41,6 @@ const SignUp = () => {
     setSubmitting(true);
     try {
       await createUserWithEmailAndPassword(getAuth(app), form.email, form.password);
-      Alert.alert("Success", "Account created successfully!");
       router.push('/sign-in'); 
     } catch (error) {
       console.error(error);

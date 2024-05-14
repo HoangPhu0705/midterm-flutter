@@ -2,6 +2,7 @@ import { View, Text, Image } from "react-native";
 import { Tabs } from "expo-router";
 import { icons } from "../../constants";
 
+
 const TabIcons = ({ icon, color, name, focused }) => {
   return (
     <View className="justify-center items-center gap-1">
@@ -20,6 +21,8 @@ const TabIcons = ({ icon, color, name, focused }) => {
   );
 };
 
+
+
 const TabsLayout = () => {
   return (
     <>
@@ -29,9 +32,18 @@ const TabsLayout = () => {
           tabBarActiveTintColor: '#FFA001',
           tabBarInactiveTintColor: '#CDCDE0',
           tabBarStyle: {
-            backgroundColor: '#161622'
+            backgroundColor: '#161622',
+            shadowColor: "#000",
+            shadowOffset: {
+              width: 0,
+              height: 2,
+            },
+            shadowOpacity: 0.25,
+            shadowRadius: 3.84,
+            elevation: 5, 
+            }
           }
-        }}
+        }
       >
         <Tabs.Screen
           name="home"
@@ -39,9 +51,9 @@ const TabsLayout = () => {
             headerShown: false,
             tabBarIcon: ({ color, focused }) => (
               <TabIcons
-                icon={icons.home}
+                icon={icons.play}
                 color={color}
-                name="Home"
+                name="Playlist"
                 focused={focused}
               />
             ),

@@ -15,15 +15,13 @@ const SignIn = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const router = useRouter(); // Initialize useRouter for navigation
+  const router = useRouter(); 
 
   const submit = async () => {
     setIsSubmitting(true);
     try {
-      const auth = getAuth();
-      await signInWithEmailAndPassword(auth, form.email, form.password);
-      Alert.alert("Success", "Signed in successfully!");
-      router.push('/home'); // Example navigation, adjust according to your routing setup
+      await signInWithEmailAndPassword(getAuth(), form.email, form.password);
+      router.push('/home');
     } catch (error) {
       console.error(error);
       Alert.alert("Error", error.message);
@@ -32,6 +30,7 @@ const SignIn = () => {
     }
   };
 
+  
   return (
     <SafeAreaView className="bg-primary h-full">
       <ScrollView>
