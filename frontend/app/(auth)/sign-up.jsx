@@ -6,7 +6,7 @@ import { View, Text, ScrollView, Dimensions, Alert, Image } from "react-native";
 import { images } from "../../constants";
 import { CustomButton, FormField } from "../../components";
 import { initializeApp } from 'firebase/app';
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth } from "../../firebaseConfig";
 
 const SignUp = () => {
@@ -21,7 +21,13 @@ const SignUp = () => {
   const submit = async () => {
     setSubmitting(true);
     try {
-      await createUserWithEmailAndPassword(auth, form.email, form.password);
+      const userCredential = await createUserWithEmailAndPassword(auth, form.email, form.password);
+      const user = userCredential.user;
+
+      await updateProfile(user, {
+        displayName: form.username,
+      });
+
       router.push('/sign-in'); 
     } catch (error) {
       console.error(error);

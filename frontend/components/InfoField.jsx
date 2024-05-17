@@ -30,8 +30,14 @@ const InfoField = ({
             onChangeText={handleChangeText}
             {...props}
         />
-        {title === "Password" && (
-          <TouchableOpacity onPress={() => {router.push('/change-password');}}>
+        {(title === "Password" || title === "Username") && (
+          <TouchableOpacity onPress={() => {
+              if(title === "Password"){
+                router.push("change-password");
+              }else {
+                router.push("change-username");
+              }
+          }}>
             <AntDesign name = "edit" size = {24} color="#fff"></AntDesign>
           </TouchableOpacity>
         )}

@@ -21,12 +21,19 @@ const Profile = () => {
   return (
     <View className="flex-1 items-center justify-start bg-black-100 p-6">
       <Image
+        
         source={images.logo}
-        style={{ width: 150, height: 150, borderRadius: 75, marginBottom: 20, backgroundColor: "black" }}
+        style={{ width: 150, height: 150, borderRadius: 75, marginBottom: 20 }}
       />
       <InfoField
         title = "Email"
         placeholder={getAuth().currentUser.email}
+      />
+
+      <InfoField
+        title = "Username"
+        placeholder={getAuth().currentUser.displayName == null ? "soundcharmer" : getAuth().currentUser.displayName}
+        otherStyles = "mt-7"
       />
 
       <InfoField
