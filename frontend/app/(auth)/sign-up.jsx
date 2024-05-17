@@ -6,27 +6,8 @@ import { View, Text, ScrollView, Dimensions, Alert, Image } from "react-native";
 import { images } from "../../constants";
 import { CustomButton, FormField } from "../../components";
 import { initializeApp } from 'firebase/app';
-import { getAuth, createUserWithEmailAndPassword, initializeAuth, getReactNativePersistence } from 'firebase/auth';
-import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBmodBJKfsculZRntClnkDoisRhweXs8G8",
-  authDomain: "midtermflutter-9c698.firebaseapp.com",
-  projectId: "midtermflutter-9c698",
-  storageBucket: "midtermflutter-9c698.appspot.com",
-  messagingSenderId: "520367706279",
-  appId: "1:520367706279:web:fa4bbd0fa21290f17d0b82"
-};
-
-
-
-const app = initializeApp(firebaseConfig);
-initializeAuth(app, {
-  persistence: getReactNativePersistence(ReactNativeAsyncStorage)
-});
-
-
-
+import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from "../../firebaseConfig";
 
 const SignUp = () => {
   const [isSubmitting, setSubmitting] = useState(false);
@@ -40,7 +21,7 @@ const SignUp = () => {
   const submit = async () => {
     setSubmitting(true);
     try {
-      await createUserWithEmailAndPassword(getAuth(app), form.email, form.password);
+      await createUserWithEmailAndPassword(auth, form.email, form.password);
       router.push('/sign-in'); 
     } catch (error) {
       console.error(error);

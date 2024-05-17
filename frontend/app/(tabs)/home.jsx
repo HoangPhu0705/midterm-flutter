@@ -7,8 +7,8 @@ import Slider from '@react-native-community/slider';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 const GET_RECENT_SONGS_API_URL = 'http://10.0.2.2:3000/soundcharm/api/recent-songs';
 const FAVORITE_API_URL = 'http://10.0.2.2:3000/soundcharm/api/add-favorite';
-import { getAuth } from '@firebase/auth'
-
+import auth from '@react-native-firebase/auth';
+import { firebase } from '@react-native-firebase/app';
 const Home = () => {
   const [tracks, setTracks] = useState([]);
   const [selectedTrack, setSelectedTrack] = useState(0);
@@ -16,7 +16,7 @@ const Home = () => {
   const [sound, setSound] = useState(null);
   const [duration, setDuration] = useState(0);
   const [position, setPosition] = useState(0);
-  const [isFav, setIsFav] = useState(false)
+  const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
     const fetchTracks = async () => {
@@ -114,9 +114,34 @@ const Home = () => {
     );
   }
 
-  const toggleFavorites = async () => {
+  const toggleFavorite = async () => {
     try{
-      const currentTrack = tracks[selectedTrack];
+      const currentUser = firebase.auth().currentUser;
+      // if (!currentUser) {
+      //   console.error('No user is currently signed in.');
+      //   return;
+      // }
+      // const userId = currentUser.uid; 
+      // const currentTrack = tracks[selectedTrack];
+      // setIsFavorite(!isFavorite);
+
+      // const response = await axios.post(FAVORITE_API_URL, {
+      //   userId, 
+      //   song: {
+      //     id: currentTrack.id,
+      //     title: currentTrack.title,
+      //     artist: currentTrack.artist,
+      //     albumArtUrl: currentTrack.albumArtUrl,
+      //     audioUrl: currentTrack.audioUrl
+      //   }
+      // });
+
+      // if (response.status === 200) {
+      //   console.log('Song added to favorites');
+      // } else {
+      //   console.log('Failed to add song to favorites');
+      // }
+
 
     }catch(err){
       console.error(err);
@@ -136,13 +161,11 @@ const Home = () => {
           artistName={currentTrack.artist}
         />
 
-        <TouchableOpacity className = "mt-14">
-          <AntDesign name="hearto" size={32} color="#fff" />
+        <TouchableOpacity className = "mt-14" onPress={toggleFavorite}>
+          <AntDesign name={isFavorite ? "heart" : "hearto"} size={32} color="#fff" />
         </TouchableOpacity>
         
       </View>
-
-
         <Slider
           value={position}
           minimumValue={0}
@@ -152,7 +175,6 @@ const Home = () => {
           maximumTrackTintColor="#D3D3D3"
           thumbTintColor="#1FB28A"
         />
-
 
         <Controls
           pause={pause}
