@@ -24,6 +24,8 @@ const TabIcons = ({ icon, color, name, focused }) => {
 
 
 const TabsLayout = () => {
+
+  
   return (
     <>
       <Tabs

@@ -43,6 +43,7 @@ const SignIn = () => {
           <FormField
             title="Email"
             value={form.email}
+            placeholder="Enter your email address"
             handleChangeText={(e) => setForm({...form, email: e })}
             otherStyles="mt-7"
             keyboardType="email-address"
@@ -50,6 +51,7 @@ const SignIn = () => {
 
           <FormField
             title="Password"
+            placeholder="Enter your password"
             value={form.password}
             handleChangeText={(e) => setForm({...form, password: e })}
             otherStyles="mt-7"

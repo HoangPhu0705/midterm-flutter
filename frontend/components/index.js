@@ -3,6 +3,7 @@ import CustomButton from "./CustomButton";
 import AlbumCover from "./AlbumCover";
 import AlbumDetail from "./AlbumDetail";
 import Controls from "./Controls";
+import InfoField from "./InfoField";
 
 export {
   FormField,
@@ -10,4 +11,5 @@ export {
   AlbumCover,
   AlbumDetail,
   Controls,
+  InfoField,
 };

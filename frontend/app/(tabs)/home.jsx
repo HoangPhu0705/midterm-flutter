@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { AlbumCover, AlbumDetail, Controls } from '../../components';
 import { Audio } from 'expo-av';
 import axios from 'axios';
 import Slider from '@react-native-community/slider';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import { getAuth } from 'firebase/auth';
+
 const GET_RECENT_SONGS_API_URL = 'http://10.0.2.2:3000/soundcharm/api/recent-songs';
-const FAVORITE_API_URL = 'http://10.0.2.2:3000/soundcharm/api/add-favorite';
-import auth from '@react-native-firebase/auth';
-import { firebase } from '@react-native-firebase/app';
+const ADD_FAVORITE_API_URL = 'http://10.0.2.2:3000/soundcharm/api/add-favorite';
+
 const Home = () => {
   const [tracks, setTracks] = useState([]);
   const [selectedTrack, setSelectedTrack] = useState(0);
@@ -16,7 +17,7 @@ const Home = () => {
   const [sound, setSound] = useState(null);
   const [duration, setDuration] = useState(0);
   const [position, setPosition] = useState(0);
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [favoriteTracks, setFavoriteTracks] = useState(new Set());
 
   useEffect(() => {
     const fetchTracks = async () => {
@@ -53,7 +54,7 @@ const Home = () => {
   const loadSound = async () => {
     if (tracks.length === 0) return;
     if (sound) {
-      await sound.unloadAsync(); 
+      await sound.unloadAsync();
     }
     const { sound: newSound, status } = await Audio.Sound.createAsync(
       { uri: tracks[selectedTrack].audioUrl },
@@ -81,22 +82,27 @@ const Home = () => {
     }
   };
 
-  const onPlay = () =>  {
+  const onPlay = () => {
     setPause(false);
-    console.log("Now playing: "+ tracks[selectedTrack].title);
+
+    console.log("Now playing: " + tracks[selectedTrack].title);
   };
 
   const onPause = () => {
     setPause(true);
-    console.log("Stop playing: "+ tracks[selectedTrack].title);
-
+    
+    console.log("Stop playing: " + tracks[selectedTrack].title);
   };
 
   const onNext = () => {
+    setPosition(0);
+    setDuration(0);
     setSelectedTrack((prev) => (prev === tracks.length - 1 ? 0 : prev + 1));
   };
 
   const onBack = () => {
+    setPosition(0);
+    setDuration(0);
     setSelectedTrack((prev) => (prev === 0 ? tracks.length - 1 : prev - 1));
   };
 
@@ -108,86 +114,86 @@ const Home = () => {
 
   if (tracks.length === 0) {
     return (
-      <View className = "justify-center items-center bg-black-100 h-full">
-        <Text style={{ color: 'white', fontWeight: 'bold' }}>Loading...</Text>
+      <View className="bg-black-100 h-full flex items-center justify-center">
+        <ActivityIndicator size="large" color="#FFA001" />
       </View>
     );
   }
 
   const toggleFavorite = async () => {
-    try{
-      const currentUser = firebase.auth().currentUser;
-      // if (!currentUser) {
-      //   console.error('No user is currently signed in.');
-      //   return;
-      // }
-      // const userId = currentUser.uid; 
-      // const currentTrack = tracks[selectedTrack];
-      // setIsFavorite(!isFavorite);
+    try {
+      const currentUser = getAuth().currentUser;
+      if (!currentUser) {
+        console.error('No user is currently signed in.');
+        return;
+      }
+      const userId = currentUser.uid;
+      const currentTrack = tracks[selectedTrack];
 
-      // const response = await axios.post(FAVORITE_API_URL, {
-      //   userId, 
-      //   song: {
-      //     id: currentTrack.id,
-      //     title: currentTrack.title,
-      //     artist: currentTrack.artist,
-      //     albumArtUrl: currentTrack.albumArtUrl,
-      //     audioUrl: currentTrack.audioUrl
-      //   }
-      // });
+      const updatedFavorites = new Set(favoriteTracks);
+      if (updatedFavorites.has(currentTrack.id)) {
+        updatedFavorites.delete(currentTrack.id);
+      } else {
+        updatedFavorites.add(currentTrack.id);
+      }
+      setFavoriteTracks(updatedFavorites);
 
-      // if (response.status === 200) {
-      //   console.log('Song added to favorites');
-      // } else {
-      //   console.log('Failed to add song to favorites');
-      // }
+      const response = await axios.post(ADD_FAVORITE_API_URL, {
+        userId,
+        song: {
+          id: currentTrack.id,
+          title: currentTrack.title,
+          artist: currentTrack.artist,
+          albumArtUrl: currentTrack.albumArtUrl,
+          audioUrl: currentTrack.audioUrl
+        }
+      });
 
-
-    }catch(err){
+      if (response.status === 200) {
+        console.log('Song added to favorites');
+      } else {
+        console.log('Failed to add song to favorites');
+      }
+    } catch (err) {
       console.error(err);
     }
-  }
-
+  };
 
   const currentTrack = tracks[selectedTrack];
 
   return (
-    <View className = "bg-black-100 h-full">
+    <View className="bg-black-100 h-full">
       <AlbumCover albumCover={currentTrack.albumArtUrl} />
 
-      <View className = "flex flex-row justify-between mb-20 mx-2">
-        <AlbumDetail
-          trackName={currentTrack.title}
-          artistName={currentTrack.artist}
-        />
+      <View className="flex flex-row justify-between mb-20 mx-2">
+        <View View className="flex-1 mr-2">
+          <AlbumDetail
+            trackName={currentTrack.title}
+            artistName={currentTrack.artist}
+          />
+        </View>
 
-        <TouchableOpacity className = "mt-14" onPress={toggleFavorite}>
-          <AntDesign name={isFavorite ? "heart" : "hearto"} size={32} color="#fff" />
+        <TouchableOpacity className="mt-14 ml-2" onPress={toggleFavorite}>
+          <AntDesign name={favoriteTracks.has(currentTrack.id) ? "heart" : "hearto"} size={32} color="#fff" />
         </TouchableOpacity>
-        
       </View>
-        <Slider
-          value={position}
-          minimumValue={0}
-          maximumValue={duration}
-          onSlidingComplete={onSlidingComplete}
-          minimumTrackTintColor="#1FB28A"
-          maximumTrackTintColor="#D3D3D3"
-          thumbTintColor="#1FB28A"
-        />
+      <Slider
+        value={position}
+        minimumValue={0}
+        maximumValue={duration}
+        onSlidingComplete={onSlidingComplete}
+        minimumTrackTintColor="#1FB28A"
+        maximumTrackTintColor="#D3D3D3"
+        thumbTintColor="#1FB28A"
+      />
 
-        <Controls
-          pause={pause}
-          onPause={onPause}
-          onPlay={onPlay}
-          onNext={onNext}
-          onBack={onBack}
-        />
-
-
-
-
-      
+      <Controls
+        pause={pause}
+        onPause={onPause}
+        onPlay={onPlay}
+        onNext={onNext}
+        onBack={onBack}
+      />
     </View>
   );
 };
