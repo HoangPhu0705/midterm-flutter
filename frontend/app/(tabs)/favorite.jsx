@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, Image, TouchableOpacity, ActivityIndicator, TextInput } from 'react-native';
 import { Audio } from 'expo-av';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import axios from 'axios';
@@ -10,11 +10,12 @@ const DELETE_FAVORITE_API_URL = 'http://10.0.2.2:3000/soundcharm/api/favorites';
 
 const Favorite = () => {
   const [favorites, setFavorites] = useState([]);
+  const [filteredFavorites, setFilteredFavorites] = useState([]);
   const [sound, setSound] = useState(null);
   const [isPlayingIndex, setIsPlayingIndex] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  // Fetch favorites from Firestore using onSnapshot for real-time updates
   useEffect(() => {
     const fetchFavorites = async () => {
       const currentUser = getAuth().currentUser;
@@ -28,17 +29,25 @@ const Favorite = () => {
       const unsubscribe = onSnapshot(favoritesRef, (snapshot) => {
         const fetchedFavorites = snapshot.docs.map(doc => doc.data());
         setFavorites(fetchedFavorites);
+        setFilteredFavorites(fetchedFavorites);
         setLoading(false); 
       });
   
-      // Cleanup subscription on unmount
       return () => unsubscribe();
     };
   
     fetchFavorites();
   }, []);
 
-  
+  useEffect(() => {
+    if (searchQuery === '') {
+      setFilteredFavorites(favorites);
+    } else {
+      setFilteredFavorites(favorites.filter(fav => 
+        fav.title.toLowerCase().includes(searchQuery.toLowerCase())
+      ));
+    }
+  }, [searchQuery, favorites]);
 
   const playSound = async (audioUrl, index) => {
     if (sound) {
@@ -61,29 +70,24 @@ const Favorite = () => {
   };
 
   const deleteFavorite = async (songId) => {
-    try{
+    try {
       const currentUser = getAuth().currentUser;
       if (!currentUser) {
         console.error('No user is currently signed in.');
         return;
       }
       const userId = currentUser.uid; 
-      const response = await axios.delete(`${DELETE_FAVORITE_API_URL}/${userId}/${songId}`)
+      const response = await axios.delete(`${DELETE_FAVORITE_API_URL}/${userId}/${songId}`);
 
-      
       if (response.status === 200) {
-        console.log('Song remove from favorite');
+        console.log('Song removed from favorites');
       } else {
         console.log('Failed to delete favorite song');
       }
-    }catch(err){
+    } catch (err) {
       console.error(err);
     }
-
-  }
-  
-
-  
+  };
 
   const renderItem = ({ item, index }) => (
     <View className="flex-row items-center mb-4 bg-gray-800 p-2 rounded-lg">
@@ -98,17 +102,12 @@ const Favorite = () => {
       >
         <AntDesign name={isPlayingIndex === index ? "pausecircleo" : "playcircleo"} size={24} color="#fff" />
       </TouchableOpacity>
-
-
       <TouchableOpacity
         onPress={() => {deleteFavorite(item.id)}}
-        className = "mx-2"
+        className="mx-2"
       >
         <AntDesign name="closecircleo" size={28} color="#fff" />
-        
       </TouchableOpacity>
-
-
     </View>
   );
 
@@ -122,11 +121,18 @@ const Favorite = () => {
 
   return (
     <View className="bg-black-100 h-full p-4">
-      {favorites.length === 0 ? (
+      <TextInput
+        className="bg-gray-800 text-white p-2 mb-4 rounded-lg"
+        placeholder="Search by song name"
+        placeholderTextColor="#7B7B8B"
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+      />
+      {filteredFavorites.length === 0 ? (
         <Text className="text-white text-center">No favorite songs found.</Text>
       ) : (
         <FlatList
-          data={favorites}
+          data={filteredFavorites}
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
           contentContainerStyle={{ paddingBottom: 16 }}
