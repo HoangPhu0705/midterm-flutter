@@ -7,7 +7,7 @@ import { images } from "../../constants";
 import { CustomButton, FormField } from "../../components";
 import { initializeApp } from 'firebase/app';
 import { getAuth, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { auth } from "../../firebaseConfig";
+// import { auth } from "../firebaseConfig";
 
 const SignUp = () => {
   const [isSubmitting, setSubmitting] = useState(false);

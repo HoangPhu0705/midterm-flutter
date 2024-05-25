@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "SoundCharm",
-    "slug": "SoundCharm",
-    "scheme": "SoundCharm",
+    "name": "soundcharm",
+    "slug": "soundcharm",
+    "scheme": "soundcharm",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -20,7 +20,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "versionCode": 1
+      "versionCode": 1,
+      "package": "com.phuhoang0705.soundcharm"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -33,7 +34,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "465b858a-2d8f-4f4b-810f-27521dd76c5a"
+        "projectId": "84f53cfd-c131-4045-ba8a-0e1d734dcf6f"
       }
     }
   }
